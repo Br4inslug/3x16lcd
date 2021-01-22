@@ -1,7 +1,16 @@
 #include "Arduino.h"
 #include <Wire.h>
 // Hinweis:   max. 32Byte, dann muss die Transmission beendet werden !!
-int i=0;
+int i = 0;
+
+void waitfordisplay()
+{
+  unsigned long start = millis();
+  while (millis() <= start + 10)
+  {
+  }
+}
+
 void LCD_Init()
 {
 
@@ -20,7 +29,7 @@ void LCD_Init()
   Wire.write(0x38);
   Wire.write(0x48);
   Wire.endTransmission();
-  delay(10);
+  waitfordisplay();
 }
 
 void clear_display()
@@ -37,14 +46,14 @@ void LCD_Test1(String word)
   Wire.beginTransmission(0x3C);
   Wire.write(0x80);
   //Wire.write (0x85); //Zeile1
-  //Wire.write (0x90); //Zeile2
-  Wire.write(0xA2); //Zeile3
+  Wire.write(0x90); //Zeile2
+  //Wire.write(0xA2); //Zeile3
   Wire.write(0x60);
 
   Wire.write(word.c_str());
 
   Wire.endTransmission();
-  delay(10);
+  waitfordisplay();
 }
 
 void setup()
@@ -61,11 +70,10 @@ void setup()
 void loop()
 {
 
-
   //delay(100);
-  String is=String(i);
-  LCD_Test1(is);
- //  delay(1000);
+  //String is=String(i);
+  LCD_Test1("Test Hallo!");
+  //  delay(1000);
   //clear_display();
-i++;
+  i++;
 }
