@@ -22,11 +22,15 @@ public:
 	void settext(int line,String text);
 	void show();
 	void clear();
+	void waitfordisplay();
 
 private:
 String firstline="                ";
 String secondline="                ";
 String thirdline="                ";
+int ifirstline;
+int isecondline;
+int ithirdline;
 
 
 };

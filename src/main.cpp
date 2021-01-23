@@ -6,7 +6,7 @@ int i = 0;
 void waitfordisplay()
 {
   unsigned long start = millis();
-  while (millis() <= start + 10)
+  while (millis() <= start + 30)
   {
   }
 }
@@ -65,6 +65,7 @@ void setup()
   LCD_Init();
 
   //delay(1000);
+    LCD_Test1("Test Hallo!");
 }
 
 void loop()
@@ -72,8 +73,8 @@ void loop()
 
   //delay(100);
   //String is=String(i);
-  LCD_Test1("Test Hallo!");
+
   //  delay(1000);
   //clear_display();
-  i++;
+ 
 }
