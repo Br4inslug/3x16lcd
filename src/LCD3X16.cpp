@@ -39,61 +39,77 @@ LCD3X16::~LCD3X16()
 void LCD3X16::waitfordisplay()
 {
 	unsigned long start = millis();
-	while (millis() <= start + 30)
+	while (millis() <= start + 50)
 	{
 	}
 }
 
-void LCD3X16::settext(int line, String text)
+void LCD3X16::settext(int line, int position, String text)
 {
+
 	if (line == 1)
 	{
-		firstline = text;
-		for (int i = 0; i < 16 - text.length(); i++)
+		//TODO hier gehts weiter nur bei änderungen schreiben
+		if (text != firstline || positionfirstline != position)
 		{
-			firstline += " ";
+			firstline = text;
+			positionfirstline = position;
+			newtext = true;
 		}
 	}
 	if (line == 2)
 	{
-		secondline = text;
-		for (int i = 0; i < 16 - text.length(); i++)
+
+		if (text != secondline || positionsecondline != position)
 		{
-			secondline += " ";
+			secondline = text;
+			positionsecondline = position;
+			newtext = true;
 		}
 	}
 	if (line == 3)
 	{
-		thirdline = text;
-		for (int i = 0; i < 16 - text.length(); i++)
+		if (text != thirdline || positionthirdline != position)
 		{
-			thirdline += " ";
+			thirdline = text;
+			positionthirdline = position;
+			newtext = true;
 		}
 	}
 }
 
 void LCD3X16::show()
 {
-	Wire.beginTransmission(0x3C);
-	Wire.write(0x40);
-	const char *first = firstline.c_str();
-	Wire.write(first);
+	if (newtext)
+	{
+		clear();
 
-	Wire.endTransmission();
+		Wire.beginTransmission(0x3C);
+		Wire.write(0x80);
+		Wire.write(0x80 + positionfirstline); //Zeile1
+		Wire.write(0x60);
+		Wire.write(firstline.c_str());
+		Wire.endTransmission();
+		waitfordisplay();
 
-	Wire.beginTransmission(0x3C);
-	Wire.write(0x40);
-	const char *second = secondline.c_str();
-	Wire.write(second);
+		Wire.beginTransmission(0x3C);
+		Wire.write(0x80);
+		Wire.write(0x90 + positionsecondline); //Zeile2
+		Wire.write(0x60);
+		Wire.write(secondline.c_str());
+		Wire.endTransmission();
+		waitfordisplay();
 
-	Wire.endTransmission();
+		Wire.beginTransmission(0x3C);
+		Wire.write(0x80);
+		Wire.write(0xA0 + positionthirdline);
+		Wire.write(0x60);
+		Wire.write(thirdline.c_str());
+		Wire.endTransmission();
+		waitfordisplay();
 
-	Wire.beginTransmission(0x3C);
-	Wire.write(0x40);
-	const char *third = thirdline.c_str();
-	Wire.write(third);
-
-	Wire.endTransmission();
+		newtext = false;
+	}
 }
 
 void LCD3X16::clear()
@@ -102,4 +118,16 @@ void LCD3X16::clear()
 	Wire.write(0x00); // Kontrollbyte senden C0=0, RS=0, R/W=0, x xxxx
 	Wire.write(0x01); // Return Home:   0 0 0 0 - 0 0 1 0     => 0x02
 	Wire.endTransmission();
+	waitfordisplay();
+}
+
+void LCD3X16::cleartext()
+{
+	firstline = "";
+	positionfirstline = 0;
+	secondline = "";
+	positionsecondline = 0;
+	thirdline = "";
+	positionthirdline = 0;
+	newtext = true;
 }

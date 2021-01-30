@@ -1,44 +1,12 @@
 #include "Arduino.h"
 #include <Wire.h>
+#include <LCD3X16.h>
+
 // Hinweis:   max. 32Byte, dann muss die Transmission beendet werden !!
 int i = 0;
-
-void waitfordisplay()
-{
-  unsigned long start = millis();
-  while (millis() <= start + 30)
-  {
-  }
-}
-
-void LCD_Init()
-{
-
-  Wire.begin();
-  Wire.beginTransmission(0x3C);
-  Wire.write(0x00);
-  Wire.write(0x38);
-  Wire.write(0x39);
-  Wire.write(0x06);
-  Wire.write(0x15); //15
-  Wire.write(0x72); // contrast 72 dunkel  78 hell
-  Wire.write(0x57); //56  5V   57  3.3V
-  Wire.write(0x6C);
-  Wire.write(0x0C);
-  Wire.write(0x01);
-  Wire.write(0x38);
-  Wire.write(0x48);
-  Wire.endTransmission();
-  waitfordisplay();
-}
-
-void clear_display()
-{
-  Wire.beginTransmission(0x3C);
-  Wire.write(0x00); // Kontrollbyte senden C0=0, RS=0, R/W=0, x xxxx
-  Wire.write(0x01); // Return Home:   0 0 0 0 - 0 0 1 0     => 0x02
-  Wire.endTransmission();
-}
+int y = 1;
+LCD3X16 lcd;
+unsigned long start = 0;
 
 void LCD_Test1(String word)
 {
@@ -53,7 +21,10 @@ void LCD_Test1(String word)
   Wire.write(word.c_str());
 
   Wire.endTransmission();
-  waitfordisplay();
+  unsigned long start = millis();
+  while (millis() <= start + 30)
+  {
+  }
 }
 
 void setup()
@@ -62,19 +33,37 @@ void setup()
 
   //delay(1000);
 
-  LCD_Init();
+  lcd.init();
 
   //delay(1000);
-    LCD_Test1("Test Hallo!");
+  //LCD_Test1("Test123!");
 }
 
 void loop()
 {
 
+  if (millis() >= start + 400)
+  {
+    i++;
+    
+    if (i >= 13)
+    {
+      i = 0;
+      y++;
+      if (y >= 4)
+      {
+        y = 1;
+      }
+    }
+
+    lcd.cleartext();
+    lcd.settext(y, i, "test");
+    start = millis();
+  }
+
   //delay(100);
   //String is=String(i);
-
+  lcd.show();
   //  delay(1000);
   //clear_display();
- 
 }
